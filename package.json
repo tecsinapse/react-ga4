@@ -1,6 +1,6 @@
 {
-  "name": "react-ga4",
-  "version": "1.4.1",
+  "name": "@tecsinapse/react-ga4",
+  "version": "1.4.2",
   "description": "React Google Analytics 4",
   "main": "dist/index.js",
   "types": "types/index.d.ts",
@@ -34,6 +34,7 @@
   "jest": {
     "testPathIgnorePatterns": [
       "dist"
-    ]
+    ],
+    "testEnvironment": "jsdom"
   }
 }

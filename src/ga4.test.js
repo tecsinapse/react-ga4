@@ -5,6 +5,15 @@ import { givenCustomMap } from "./ga4.mock";
 const newDate = new Date("2020-01-01");
 jest.mock("./gtag");
 jest.useFakeTimers("modern").setSystemTime(newDate.getTime());
+const mutationObserverMock = jest.fn(function MutationObserver(callback) {
+  this.observe = jest.fn();
+  this.disconnect = jest.fn();
+  // Optionally add a trigger() method to manually trigger a change
+  this.trigger = (mockedMutationsList) => {
+    callback(mockedMutationsList, this);
+  };
+});
+global.MutationObserver = mutationObserverMock;
 
 describe("GA4", () => {
   // Given
@@ -183,7 +192,7 @@ describe("GA4", () => {
       // Given
       const clientId = "clientId value";
       gtag.mockImplementationOnce((command, target, field_name, cb) => {
-        setImmediate(() => cb(clientId));
+        setTimeout(() => cb(clientId), 0);
       });
 
       const callback = jest.fn(() => {
