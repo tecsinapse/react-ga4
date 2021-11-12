@@ -79,27 +79,38 @@ export class GA4 {
   }
 
   _loadGA = (GA_MEASUREMENT_ID, nonce) => {
-    if (typeof window === "undefined" || typeof document === "undefined") {
-      return;
-    }
-
-    if (!this._hasLoadedGA) {
-      // Global Site Tag (gtag.js) - Google Analytics
-      const script = document.createElement("script");
-      script.async = true;
-      script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
-      if (nonce) {
-        script.setAttribute("nonce", nonce);
+    const loader = () => {
+      if (typeof window === "undefined" || typeof document === "undefined") {
+        return;
       }
-      document.body.appendChild(script);
 
-      window.dataLayer = window.dataLayer || [];
-      window.gtag = function gtag() {
-        window.dataLayer.push(arguments);
-      };
+      if (!this._hasLoadedGA) {
+        // Global Site Tag (gtag.js) - Google Analytics
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+        if (nonce) {
+          script.setAttribute("nonce", nonce);
+        }
+        document.body.appendChild(script);
 
-      this._hasLoadedGA = true;
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function gtag() {
+          window.dataLayer.push(arguments);
+        };
+
+        this._hasLoadedGA = true;
+      }
     }
+
+    const observer = new MutationObserver(() => {
+      if (document.body) {
+        // It exists now
+        loader();
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.documentElement, {childList: true});
   };
 
   _toGtagOptions = (gaOptions) => {
